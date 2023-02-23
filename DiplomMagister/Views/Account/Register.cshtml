@@ -1,0 +1,28 @@
+﻿@using DiplomMagister.Models;
+@model RegisterViewModel 
+
+@{
+
+}
+
+<div class="card card-body">
+    <form asp-antiforgery="true" asp-action="Register" asp-controller="Account" method="post">
+        <label asp-for="FirstName"></label>
+        <input type="text" asp-for="FirstName" placeholder="Иван" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+
+        <label asp-for="LastName"></label>
+        <input type="text" asp-for="LastName" placeholder="Иванов" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+
+        <label asp-for="Email"></label>
+        <input type="email" asp-for="Email" placeholder="example@mail.ru" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+
+        <label asp-for="Password">Введите пароль</label>
+        <input type="password" asp-for="Password" placeholder="******" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+
+        <input type="submit" value="Зарегистрироваться"/>
+    </form>
+</div>
