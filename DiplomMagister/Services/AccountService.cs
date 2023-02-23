@@ -91,7 +91,7 @@ namespace DiplomMagister.Services
 
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-            httpContext.Response.Cookies.Append("accessToken", $"{encodedJwt}");
+            httpContext.Response.Cookies.Append("accessToken",  $"{encodedJwt}");
 
             var token = new Token()
             {
