@@ -7,6 +7,8 @@
 
 <div class="card card-body">
     <form asp-antiforgery="true" asp-action="Login" asp-controller="Account" method="post">
+        <span id="LoginError" class="text-danger"></span>
+
         <label asp-for="Login"></label>
         <input type="email" asp-for="Login" placeholder="example@mail.ru" />
         <span asp-validation-for="Login" class="text-danger"></span>

@@ -39,7 +39,7 @@ namespace DiplomMagister.Services
             UserClient uClient = new UserClient()
             {
                 Id = Guid.NewGuid().ToString(),
-                Userinfo = new UserInfo()
+                UserInfo = new UserInfo()
                 {
                     FirstName = registerViewModel.FirstName,
                     Lastname = registerViewModel.LastName,
@@ -53,6 +53,7 @@ namespace DiplomMagister.Services
                 Role = Role.User,
                 UserClient = uClient
             };
+
 
             _context.UserClients.Add(uClient);
             _context.UsersData.Add(uData);
@@ -140,6 +141,15 @@ namespace DiplomMagister.Services
         public void Log(string text)
         {
             Debug.WriteLine($"\n\n\n{text}\n\n\n");
+        }
+
+        internal void Logout(HttpContext httpContext)
+        {
+            var token = httpContext.Request.Headers["Authorization"].ToString();
+            httpContext.Request.Headers.Remove("Authorization");
+            var tokenDTO = _context.Tokens.FirstOrDefault(x=>x.EncodedJwt.Equals(token.Replace("Bearer ", "")));
+            if (tokenDTO == null) { throw new Exception("User not logged in"); }
+            _context.Tokens.Remove(tokenDTO);
         }
     }
 }

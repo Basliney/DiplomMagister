@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DiplomMagister.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230206194333_init")]
-    partial class init
+    [Migration("20230226144652_initUser")]
+    partial class initUser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,22 +24,66 @@ namespace DiplomMagister.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("DiplomMagister.Classes.Client.Tag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ShortName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserClientId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserClientId");
+
+                    b.ToTable("Tags");
+                });
+
             modelBuilder.Entity("DiplomMagister.Classes.Client.UserClient", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
-                    b.Property<int>("Role")
+                    b.HasKey("Id");
+
+                    b.ToTable("UserClients");
+                });
+
+            modelBuilder.Entity("DiplomMagister.Classes.TagDTO", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    b.Property<int>("TokenId")
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("TagId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("UserClientId")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TokenId");
+                    b.HasIndex("TagId");
 
-                    b.ToTable("UserClients");
+                    b.HasIndex("UserClientId");
+
+                    b.ToTable("TagDTO");
                 });
 
             modelBuilder.Entity("DiplomMagister.Classes.Token", b =>
@@ -77,16 +121,20 @@ namespace DiplomMagister.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Login")
                         .HasColumnType("text");
 
                     b.Property<string>("Password")
                         .HasColumnType("text");
 
-                    b.Property<string>("Role")
-                        .HasColumnType("text");
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
 
                     b.Property<string>("UserClientId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -96,15 +144,16 @@ namespace DiplomMagister.Migrations
                     b.ToTable("UsersData");
                 });
 
+            modelBuilder.Entity("DiplomMagister.Classes.Client.Tag", b =>
+                {
+                    b.HasOne("DiplomMagister.Classes.Client.UserClient", null)
+                        .WithMany("Favorites")
+                        .HasForeignKey("UserClientId");
+                });
+
             modelBuilder.Entity("DiplomMagister.Classes.Client.UserClient", b =>
                 {
-                    b.HasOne("DiplomMagister.Classes.Token", "Token")
-                        .WithMany()
-                        .HasForeignKey("TokenId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.OwnsOne("DiplomMagister.Classes.Client.UserInfo", "Userinfo", b1 =>
+                    b.OwnsOne("DiplomMagister.Classes.Client.UserInfo", "UserInfo", b1 =>
                         {
                             b1.Property<string>("UserClientId")
                                 .HasColumnType("text");
@@ -117,12 +166,19 @@ namespace DiplomMagister.Migrations
                                 .IsRequired()
                                 .HasColumnType("text");
 
+                            b1.Property<string>("Mail")
+                                .IsRequired()
+                                .HasColumnType("text");
+
                             b1.Property<string>("Middlename")
                                 .HasColumnType("text");
 
                             b1.Property<string>("Name")
                                 .IsRequired()
                                 .HasColumnType("text");
+
+                            b1.Property<int>("Privacy")
+                                .HasColumnType("integer");
 
                             b1.HasKey("UserClientId");
 
@@ -132,19 +188,41 @@ namespace DiplomMagister.Migrations
                                 .HasForeignKey("UserClientId");
                         });
 
-                    b.Navigation("Token");
-
-                    b.Navigation("Userinfo")
+                    b.Navigation("UserInfo")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DiplomMagister.Classes.TagDTO", b =>
+                {
+                    b.HasOne("DiplomMagister.Classes.Client.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DiplomMagister.Classes.Client.UserClient", "UserClient")
+                        .WithMany()
+                        .HasForeignKey("UserClientId");
+
+                    b.Navigation("Tag");
+
+                    b.Navigation("UserClient");
                 });
 
             modelBuilder.Entity("JWT_Example_ASP.Models.UserData", b =>
                 {
                     b.HasOne("DiplomMagister.Classes.Client.UserClient", "UserClient")
                         .WithMany()
-                        .HasForeignKey("UserClientId");
+                        .HasForeignKey("UserClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("UserClient");
+                });
+
+            modelBuilder.Entity("DiplomMagister.Classes.Client.UserClient", b =>
+                {
+                    b.Navigation("Favorites");
                 });
 #pragma warning restore 612, 618
         }

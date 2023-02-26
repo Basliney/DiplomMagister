@@ -1,5 +1,6 @@
 using DiplomMagister.Classes;
 using DiplomMagister.Data;
+using DiplomMagister.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -61,16 +62,7 @@ internal class Program
 
         app.UseRouting();
 
-        app.Use(async (context, next) =>
-        {
-            var token = context.Request.Cookies["accessToken"];//.FirstOrDefault(x=>x.Key.Equals("accessToken")).Value;
-            if (token != null && !string.IsNullOrEmpty(token.ToString()))
-            {
-                context.Request.Headers["Accept"] = "application/json";//.Add("Accept", "application/json");
-                context.Request.Headers.Add("Authorization", "Bearer " + token);
-            }
-            await next();
-        });
+        app.UseMiddleware<TokenMiddleware>();
 
         app.UseAuthentication();
         app.UseAuthorization();
