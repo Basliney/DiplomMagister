@@ -1,4 +1,5 @@
-﻿using JWT_Example_ASP.Models;
+﻿using DiplomMagister.Classes.Tests;
+using JWT_Example_ASP.Models;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -15,7 +16,9 @@ namespace DiplomMagister.Classes.Client
         /// <summary>
         /// Избранные тэги
         /// </summary>
-        public List<Tag> Favorites { get; set; }
+        public List<Tag> Favorites { get; set; } = new List<Tag>();
+        public List<Test> CreatedTests { get; set; } = new List<Test>();
+        public List<Statistics> Statistics { get; set; } = new List<Statistics>();
     }
 
     [Owned]
@@ -27,7 +30,8 @@ namespace DiplomMagister.Classes.Client
         public string Lastname { get; set; } = "";
         public string Mail { get; set; } = "";
 
-        public Privacy Privacy { get; set; }
+
+        public Privacy Privacy { get; set; } = Privacy.Public;
     }
 
     public enum Privacy

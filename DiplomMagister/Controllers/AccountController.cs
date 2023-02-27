@@ -1,6 +1,7 @@
 ﻿using DiplomMagister.Data;
 using DiplomMagister.Models;
 using DiplomMagister.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -22,7 +23,7 @@ namespace DiplomMagister.Controllers
         {
             if (HttpContext.User.Identity.IsAuthenticated)
             {
-                return RedirectToActionPermanent("Home", "Index");
+                return RedirectToActionPermanent("Index", "Home");
             }
             return View();
         }
@@ -49,6 +50,7 @@ namespace DiplomMagister.Controllers
             return RedirectToActionPermanent("Index", "Home");
         }
 
+        [Authorize]
         public IActionResult Logout()
         {
             try

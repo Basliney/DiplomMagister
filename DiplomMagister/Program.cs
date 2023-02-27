@@ -10,7 +10,8 @@ internal class Program
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        var connection = builder.Configuration.GetConnectionString("DefaultConnection");
+        var configuration = builder.Configuration;
+        var connection = configuration.GetConnectionString("DefaultConnection");
 
         builder.Services.AddRazorPages();
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -22,12 +23,12 @@ internal class Program
                     // укзывает, будет ли валидироваться издатель при валидации токена
                     ValidateIssuer = true,
                     // строка, представляющая издателя
-                    ValidIssuer = AuthOptions.ISSUER,
+                    ValidIssuer = configuration.GetSection("Bearer:ISSUER").Value,  //builder.Configuration["Bearer:ISSUER"],
 
                     // будет ли валидироваться потребитель токена
                     ValidateAudience = true,
                     // установка потребителя токена
-                    ValidAudience = AuthOptions.AUDIENCE,
+                    ValidAudience = configuration.GetSection("Bearer:AUDIENCE").Value,  //builder.Configuration["Bearer:AUDIENCE"],
                     // будет ли валидироваться время существования
                     ValidateLifetime = true,
 

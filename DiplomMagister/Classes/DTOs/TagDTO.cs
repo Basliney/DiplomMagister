@@ -1,6 +1,7 @@
 ﻿using DiplomMagister.Classes.Client;
+using DiplomMagister.Classes.Tests;
 
-namespace DiplomMagister.Classes
+namespace DiplomMagister.Classes.DTOs
 {
     public class TagDTO
     {

@@ -6,6 +6,7 @@ using DiplomMagister.Models;
 using JWT_Example_ASP.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -43,6 +44,8 @@ namespace DiplomMagister.Services
                 {
                     FirstName = registerViewModel.FirstName,
                     Lastname = registerViewModel.LastName,
+                    Mail = registerViewModel.Email,
+                    Privacy = Privacy.Public
                 },
             };
 
@@ -78,13 +81,16 @@ namespace DiplomMagister.Services
 
         public void Authenticate(ClaimsIdentity identity, HttpContext httpContext)
         {
+            var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
             var now = DateTime.UtcNow;
-            var exp = now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME));
+            var exp = now.Add(TimeSpan.FromMinutes(int.Parse(builder["Bearer:LIFETIME"])));
+            var issuer = builder["Bearer:ISSUER"];
+            var audience = builder["Bearer:AUDIENCE"];
 
             // создаем JWT-токен
             var jwt = new JwtSecurityToken(
-                    issuer: AuthOptions.ISSUER,
-                    audience: AuthOptions.AUDIENCE,
+                    issuer: issuer,
+                    audience: audience,
                     notBefore: now,
                     claims: identity.Claims,
                     expires: exp,
@@ -93,17 +99,6 @@ namespace DiplomMagister.Services
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
             httpContext.Response.Cookies.Append("accessToken",  $"{encodedJwt}");
-
-            var token = new Token()
-            {
-                EncodedJwt = encodedJwt,
-                Expires = exp,
-                NotBefore = now,
-                Scope = ""
-            };
-
-            _context.Tokens.Add(token);
-            _context.SaveChanges();
         }
 
         public ClaimsIdentity? GetIdentity(string login, string password)
@@ -147,9 +142,8 @@ namespace DiplomMagister.Services
         {
             var token = httpContext.Request.Headers["Authorization"].ToString();
             httpContext.Request.Headers.Remove("Authorization");
-            var tokenDTO = _context.Tokens.FirstOrDefault(x=>x.EncodedJwt.Equals(token.Replace("Bearer ", "")));
-            if (tokenDTO == null) { throw new Exception("User not logged in"); }
-            _context.Tokens.Remove(tokenDTO);
+            httpContext.Response.Cookies.Delete("accessToken");
+            var t = httpContext.Request.Headers;
         }
     }
 }
