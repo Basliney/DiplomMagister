@@ -4,12 +4,14 @@ using DiplomMagister.Classes.StaticData;
 using DiplomMagister.Data;
 using DiplomMagister.Models;
 using JWT_Example_ASP.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Principal;
 
 namespace DiplomMagister.Services
 {
@@ -98,20 +100,49 @@ namespace DiplomMagister.Services
 
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-            httpContext.Response.Cookies.Append("accessToken",  $"{encodedJwt}");
+            try
+            {
+                httpContext.Response.Cookies.Append("accessToken", $"{encodedJwt}");
+            }
+            catch(Exception ex)
+            {
+                httpContext.Response.Cookies.Delete("accessToken");
+                httpContext.Response.Cookies.Append("accessToken", $"{encodedJwt}");
+            }
+        }
+
+        public AccountService RenewTokenOfAuthorizedUser(HttpContext httpContext, string id)
+        {
+            UserData person = GetUserDataById(id);
+            ClaimsIdentity claimsIdentity = GetClaimsIdentity(person);
+
+            if (claimsIdentity == null) { throw new BadHttpRequestException("User not found"); }
+
+            try
+            {
+                Authenticate(claimsIdentity, httpContext);
+            }
+            catch (Exception ex)
+            {
+                Log(ex.ToString());
+                return null;
+            }
+
+            Debug.WriteLine("\n\n\nToken was renew\n\n\n");
+            return this;
         }
 
         public ClaimsIdentity? GetIdentity(string login, string password)
         {
-            UserData person = _context.UsersData.Include(x=>x.UserClient).FirstOrDefault(x => x.Login.Equals(login));
+            UserData person = GetUserData(login);
+            VerifyPassword(password, person);
+            ClaimsIdentity claimsIdentity = GetClaimsIdentity(person);
 
-            if (person == null || person.UserClient == null) { throw new Exception("User not found"); }
+            return claimsIdentity;
+        }
 
-            if (!CryptoService.VerifyHashedPassword(person.Password, password))
-            {
-                throw new Exception("Identity wasn't found");
-            }
-
+        private ClaimsIdentity GetClaimsIdentity(UserData person)
+        {
             var claims = new List<Claim>
                 {
                     new Claim(ClaimsIdentity.DefaultNameClaimType, person.UserClient.Id),
@@ -121,8 +152,31 @@ namespace DiplomMagister.Services
             ClaimsIdentity claimsIdentity =
                 new ClaimsIdentity(claims, "accessToken", ClaimsIdentity.DefaultNameClaimType,
                     ClaimsIdentity.DefaultRoleClaimType);
-
             return claimsIdentity;
+        }
+
+        private void VerifyPassword(string password, UserData person)
+        {
+            if (!CryptoService.VerifyHashedPassword(person.Password, password))
+            {
+                throw new Exception("Identity wasn't found");
+            }
+        }
+
+        private UserData GetUserData(string login)
+        {
+            UserData person = _context.UsersData.Include(x => x.UserClient).FirstOrDefault(x => x.Login.Equals(login));
+            if (person == null || person.UserClient == null) { throw new Exception("User not found"); }
+
+            return person;
+        }
+
+        private UserData GetUserDataById(string id = "")
+        {
+            UserData person = _context.UsersData.Include(x => x.UserClient).FirstOrDefault(x => x.UserClient.Id.Equals(id));
+            if (person == null || person.UserClient == null) { throw new Exception("User not found"); }
+
+            return person;
         }
 
         /// <summary>
@@ -143,7 +197,6 @@ namespace DiplomMagister.Services
             var token = httpContext.Request.Headers["Authorization"].ToString();
             httpContext.Request.Headers.Remove("Authorization");
             httpContext.Response.Cookies.Delete("accessToken");
-            var t = httpContext.Request.Headers;
         }
     }
 }

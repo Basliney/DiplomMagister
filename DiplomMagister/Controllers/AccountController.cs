@@ -50,7 +50,6 @@ namespace DiplomMagister.Controllers
             return RedirectToActionPermanent("Index", "Home");
         }
 
-        [Authorize]
         public IActionResult Logout()
         {
             try

@@ -64,9 +64,12 @@ internal class Program
         app.UseRouting();
 
         app.UseMiddleware<TokenMiddleware>();
+        app.UseMiddleware<AccessMiddleware>();
 
         app.UseAuthentication();
         app.UseAuthorization();
+
+        //app.UseMiddleware<AccessMiddleware>();
 
         app.UseEndpoints(endpoints =>
         {
