@@ -10,7 +10,7 @@ namespace DiplomMagister.Data
     public class ApplicationDbContext : DbContext
     {
         public DbSet<UserClient> UserClients { get; set; }
-        public DbSet<UserData> UsersData { get; set; }
+        public DbSet<ProfileSettings> ProfileSettings { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<TagDTO> TagDTO { get; set; }
         public DbSet<Test> Tests { get; set; }
@@ -35,9 +35,9 @@ namespace DiplomMagister.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            //modelBuilder.Entity<UserClient>()
+            //modelBuilder.Entity<Owner>()
             //    .HasOne(x => x.)
-            //    .WithOne(x => x.UserClient);
+            //    .WithOne(x => x.Owner);
         }
     }
 

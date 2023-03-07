@@ -35,15 +35,18 @@ namespace DiplomMagister.Services
         /// <param name="registerViewModel">Модель регистрируемого пользователя</param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public async Task<UserData> Register(RegisterViewModel registerViewModel, HttpContext httpContext)
+        public async Task<ProfileSettings> Register(RegisterViewModel registerViewModel, HttpContext httpContext)
         {
             if (!FreeEmail(registerViewModel.Email)) { throw new UnauthorizedAccessException("Email is not free"); }
 
+            var dateNow = DateTime.UtcNow;
             UserClient uClient = new UserClient()
             {
                 Id = Guid.NewGuid().ToString(),
-                UserInfo = new UserInfo()
+                ProfileInformation = new ProfileInformation()
                 {
+                    Name = $"user{dateNow.Ticks}",
+                    EditingDate = dateNow,
                     FirstName = registerViewModel.FirstName,
                     Lastname = registerViewModel.LastName,
                     Mail = registerViewModel.Email,
@@ -51,17 +54,18 @@ namespace DiplomMagister.Services
                 },
             };
 
-            UserData uData = new UserData()
+            ProfileSettings uData = new ProfileSettings()
             {
                 Login = registerViewModel.Email,
                 Password = CryptoService.HashPassword(registerViewModel.Password),
                 Role = Role.User,
-                UserClient = uClient
+                Owner = uClient,
+                CreationDate = DateTime.UtcNow
             };
 
 
             _context.UserClients.Add(uClient);
-            _context.UsersData.Add(uData);
+            _context.ProfileSettings.Add(uData);
             await _context.SaveChangesAsync();
 
             var identity = GetIdentity(registerViewModel.Email, registerViewModel.Password);
@@ -113,7 +117,7 @@ namespace DiplomMagister.Services
 
         public AccountService RenewTokenOfAuthorizedUser(HttpContext httpContext, string id)
         {
-            UserData person = GetUserDataById(id);
+            ProfileSettings person = GetUserDataById(id);
             ClaimsIdentity claimsIdentity = GetClaimsIdentity(person);
 
             if (claimsIdentity == null) { throw new BadHttpRequestException("User not found"); }
@@ -134,18 +138,18 @@ namespace DiplomMagister.Services
 
         public ClaimsIdentity? GetIdentity(string login, string password)
         {
-            UserData person = GetUserData(login);
+            ProfileSettings person = GetUserData(login);
             VerifyPassword(password, person);
             ClaimsIdentity claimsIdentity = GetClaimsIdentity(person);
 
             return claimsIdentity;
         }
 
-        private ClaimsIdentity GetClaimsIdentity(UserData person)
+        private ClaimsIdentity GetClaimsIdentity(ProfileSettings person)
         {
             var claims = new List<Claim>
                 {
-                    new Claim(ClaimsIdentity.DefaultNameClaimType, person.UserClient.Id),
+                    new Claim(ClaimsIdentity.DefaultNameClaimType, person.Owner.Id),
                     new Claim(ClaimsIdentity.DefaultRoleClaimType, person.Role.GetEnumDescription())
                 };
 
@@ -155,7 +159,7 @@ namespace DiplomMagister.Services
             return claimsIdentity;
         }
 
-        private void VerifyPassword(string password, UserData person)
+        private void VerifyPassword(string password, ProfileSettings person)
         {
             if (!CryptoService.VerifyHashedPassword(person.Password, password))
             {
@@ -163,18 +167,18 @@ namespace DiplomMagister.Services
             }
         }
 
-        private UserData GetUserData(string login)
+        private ProfileSettings GetUserData(string login)
         {
-            UserData person = _context.UsersData.Include(x => x.UserClient).FirstOrDefault(x => x.Login.Equals(login));
-            if (person == null || person.UserClient == null) { throw new Exception("User not found"); }
+            ProfileSettings person = _context.ProfileSettings.Include(x => x.Owner).FirstOrDefault(x => x.Login.Equals(login));
+            if (person == null || person.Owner == null) { throw new Exception("User not found"); }
 
             return person;
         }
 
-        private UserData GetUserDataById(string id = "")
+        private ProfileSettings GetUserDataById(string id = "")
         {
-            UserData person = _context.UsersData.Include(x => x.UserClient).FirstOrDefault(x => x.UserClient.Id.Equals(id));
-            if (person == null || person.UserClient == null) { throw new Exception("User not found"); }
+            ProfileSettings person = _context.ProfileSettings.Include(x => x.Owner).FirstOrDefault(x => x.Owner.Id.Equals(id));
+            if (person == null || person.Owner == null) { throw new Exception("User not found"); }
 
             return person;
         }
@@ -184,7 +188,7 @@ namespace DiplomMagister.Services
         /// </summary>
         /// <param name="email">Почта</param>
         /// <returns></returns>
-        public bool FreeEmail(string email) => !string.IsNullOrEmpty(email) && _context.UsersData.Select(x=>x.Login)
+        public bool FreeEmail(string email) => !string.IsNullOrEmpty(email) && _context.ProfileSettings.Select(x=>x.Login)
             .FirstOrDefault(x => x.Equals(email)) == null;
 
         public void Log(string text)

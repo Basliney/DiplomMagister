@@ -1,0 +1,23 @@
+﻿@using DiplomMagister.Classes.Tests
+@{
+    List<string> questions = Model;
+}
+
+@{
+    if (questions != null)
+    {
+        foreach (var item in questions)
+        {
+            Print(item);
+        }
+    }
+    <p>its all</p>
+}
+
+@{
+    void Print(string question)
+    {
+        <p>@QuestionJSONParser.FromJSON(question).Title</p>
+        <p>@QuestionJSONParser.FromJSON(question).Essence</p>
+    }
+}

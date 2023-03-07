@@ -10,8 +10,8 @@ namespace DiplomMagister.Classes.Client
     {
         [Key]
         public string Id { get; set; }
-        //public UserData UserData { get; set; }
-        public UserInfo UserInfo { get; set; }
+        //public ProfileSettings ProfileSettings { get; set; }
+        public ProfileInformation ProfileInformation { get; set; }
 
         /// <summary>
         /// Избранные тэги
@@ -22,13 +22,14 @@ namespace DiplomMagister.Classes.Client
     }
 
     [Owned]
-    public class UserInfo
+    public class ProfileInformation
     {
         public string Name { get; set; } = "";
         public string FirstName { get; set; } = "";
-        public string? Middlename { get; set; }
         public string Lastname { get; set; } = "";
         public string Mail { get; set; } = "";
+
+        public DateTime? EditingDate { get; set; }
 
 
         public Privacy Privacy { get; set; } = Privacy.Public;

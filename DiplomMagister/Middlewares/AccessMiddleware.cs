@@ -17,7 +17,7 @@ namespace DiplomMagister.Middlewares
 
         public async Task InvokeAsync(HttpContext context, ApplicationDbContext dbContext)
         {
-            // context.Request.Path = context.Request.Path.ToString().Replace("https", "http");
+            // _context.Request.Path = _context.Request.Path.ToString().Replace("https", "http");
             var token = context.Request.Headers["Authorization"].ToString();
             if (token is not null && token != string.Empty)
             {

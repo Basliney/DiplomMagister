@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DiplomMagister.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230226202538_initBasicQuestion")]
-    partial class initBasicQuestion
+    [Migration("20230305182338_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -217,7 +217,7 @@ namespace DiplomMagister.Migrations
                     b.ToTable("TestInfo");
                 });
 
-            modelBuilder.Entity("DiplomMagister.Classes.Token", b =>
+            modelBuilder.Entity("JWT_Example_ASP.Models.ProfileSettings", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -225,37 +225,13 @@ namespace DiplomMagister.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("EncodedJwt")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("Expires")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("NotBefore")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Scope")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Tokens");
-                });
-
-            modelBuilder.Entity("JWT_Example_ASP.Models.UserData", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Created")
+                    b.Property<DateTime?>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Login")
+                        .HasColumnType("text");
+
+                    b.Property<string>("OwnerId")
                         .HasColumnType("text");
 
                     b.Property<string>("Password")
@@ -264,15 +240,11 @@ namespace DiplomMagister.Migrations
                     b.Property<int>("Role")
                         .HasColumnType("integer");
 
-                    b.Property<string>("UserClientId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserClientId");
+                    b.HasIndex("OwnerId");
 
-                    b.ToTable("UsersData");
+                    b.ToTable("ProfileSettings");
                 });
 
             modelBuilder.Entity("TagTest", b =>
@@ -306,10 +278,13 @@ namespace DiplomMagister.Migrations
 
             modelBuilder.Entity("DiplomMagister.Classes.Client.UserClient", b =>
                 {
-                    b.OwnsOne("DiplomMagister.Classes.Client.UserInfo", "UserInfo", b1 =>
+                    b.OwnsOne("DiplomMagister.Classes.Client.ProfileInformation", "ProfileInformation", b1 =>
                         {
                             b1.Property<string>("UserClientId")
                                 .HasColumnType("text");
+
+                            b1.Property<DateTime?>("EditingDate")
+                                .HasColumnType("timestamp with time zone");
 
                             b1.Property<string>("FirstName")
                                 .IsRequired()
@@ -321,9 +296,6 @@ namespace DiplomMagister.Migrations
 
                             b1.Property<string>("Mail")
                                 .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<string>("Middlename")
                                 .HasColumnType("text");
 
                             b1.Property<string>("Name")
@@ -341,7 +313,7 @@ namespace DiplomMagister.Migrations
                                 .HasForeignKey("UserClientId");
                         });
 
-                    b.Navigation("UserInfo")
+                    b.Navigation("ProfileInformation")
                         .IsRequired();
                 });
 
@@ -412,15 +384,13 @@ namespace DiplomMagister.Migrations
                     b.Navigation("TestInfo");
                 });
 
-            modelBuilder.Entity("JWT_Example_ASP.Models.UserData", b =>
+            modelBuilder.Entity("JWT_Example_ASP.Models.ProfileSettings", b =>
                 {
-                    b.HasOne("DiplomMagister.Classes.Client.UserClient", "UserClient")
+                    b.HasOne("DiplomMagister.Classes.Client.UserClient", "Owner")
                         .WithMany()
-                        .HasForeignKey("UserClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("OwnerId");
 
-                    b.Navigation("UserClient");
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("TagTest", b =>

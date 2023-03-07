@@ -18,10 +18,13 @@ namespace DiplomMagister.Classes.Tests
         [Required]
         public TestInfo TestInfo { get; set; } = new TestInfo();
 
-        public List<QuestionAbs> Questions { get; set; } = new List<QuestionAbs>();
+        /// <summary>
+        /// JSON serialized QuestionAbs objects
+        /// </summary>
+        public List<string>? Questions { get; set; } = new List<string>();
  
-        public List<Tag> Tags { get; set; } = new List<Tag>();
-        public List<Statistics> Statistics { get; set; } = new List<Statistics>();
+        public List<Tag>? Tags { get; set; } = new List<Tag>();
+        public List<Statistics>? Statistics { get; set; } = new List<Statistics>();
         public Visibility Visibility { get; set; } = Visibility.Visible;
     }
 }

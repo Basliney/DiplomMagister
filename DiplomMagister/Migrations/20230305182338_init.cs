@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace DiplomMagister.Migrations
 {
-    public partial class initBasicQuestion : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -24,6 +24,66 @@ namespace DiplomMagister.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TestInfo", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserClients",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    ProfileInformation_Name = table.Column<string>(type: "text", nullable: false),
+                    ProfileInformation_FirstName = table.Column<string>(type: "text", nullable: false),
+                    ProfileInformation_Lastname = table.Column<string>(type: "text", nullable: false),
+                    ProfileInformation_Mail = table.Column<string>(type: "text", nullable: false),
+                    ProfileInformation_EditingDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ProfileInformation_Privacy = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserClients", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProfileSettings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Login = table.Column<string>(type: "text", nullable: true),
+                    Password = table.Column<string>(type: "text", nullable: true),
+                    Role = table.Column<int>(type: "integer", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    OwnerId = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProfileSettings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProfileSettings_UserClients_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "UserClients",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tags",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ShortName = table.Column<string>(type: "text", nullable: false),
+                    FullName = table.Column<string>(type: "text", nullable: false),
+                    Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UserClientId = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tags", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tags_UserClients_UserClientId",
+                        column: x => x.UserClientId,
+                        principalTable: "UserClients",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -53,6 +113,31 @@ namespace DiplomMagister.Migrations
                         principalTable: "UserClients",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TagDTO",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TagId = table.Column<int>(type: "integer", nullable: false),
+                    UserClientId = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TagDTO", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TagDTO_Tags_TagId",
+                        column: x => x.TagId,
+                        principalTable: "Tags",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TagDTO_UserClients_UserClientId",
+                        column: x => x.UserClientId,
+                        principalTable: "UserClients",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -134,6 +219,11 @@ namespace DiplomMagister.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProfileSettings_OwnerId",
+                table: "ProfileSettings",
+                column: "OwnerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_QuestionAbs_TestId",
                 table: "QuestionAbs",
                 column: "TestId");
@@ -146,6 +236,21 @@ namespace DiplomMagister.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Statistics_UserClientId",
                 table: "Statistics",
+                column: "UserClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TagDTO_TagId",
+                table: "TagDTO",
+                column: "TagId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TagDTO_UserClientId",
+                table: "TagDTO",
+                column: "UserClientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tags_UserClientId",
+                table: "Tags",
                 column: "UserClientId");
 
             migrationBuilder.CreateIndex(
@@ -167,19 +272,31 @@ namespace DiplomMagister.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "ProfileSettings");
+
+            migrationBuilder.DropTable(
                 name: "QuestionAbs");
 
             migrationBuilder.DropTable(
                 name: "Statistics");
 
             migrationBuilder.DropTable(
+                name: "TagDTO");
+
+            migrationBuilder.DropTable(
                 name: "TagTest");
+
+            migrationBuilder.DropTable(
+                name: "Tags");
 
             migrationBuilder.DropTable(
                 name: "Tests");
 
             migrationBuilder.DropTable(
                 name: "TestInfo");
+
+            migrationBuilder.DropTable(
+                name: "UserClients");
         }
     }
 }
