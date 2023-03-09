@@ -19,7 +19,7 @@ namespace DiplomMagister.Classes.Tests
         public TestInfo TestInfo { get; set; } = new TestInfo();
 
         /// <summary>
-        /// JSON serialized QuestionAbs objects
+        /// JSON serialized IQuestionAbs objects
         /// </summary>
         public List<string>? Questions { get; set; } = new List<string>();
  

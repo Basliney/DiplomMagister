@@ -141,7 +141,7 @@ namespace DiplomMagister.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "QuestionAbs",
+                name: "IQuestionAbs",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -225,7 +225,7 @@ namespace DiplomMagister.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_QuestionAbs_TestId",
-                table: "QuestionAbs",
+                table: "IQuestionAbs",
                 column: "TestId");
 
             migrationBuilder.CreateIndex(
@@ -275,7 +275,7 @@ namespace DiplomMagister.Migrations
                 name: "ProfileSettings");
 
             migrationBuilder.DropTable(
-                name: "QuestionAbs");
+                name: "IQuestionAbs");
 
             migrationBuilder.DropTable(
                 name: "Statistics");

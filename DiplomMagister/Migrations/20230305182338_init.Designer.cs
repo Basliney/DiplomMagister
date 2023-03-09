@@ -58,7 +58,7 @@ namespace DiplomMagister.Migrations
                     b.ToTable("TagDTO");
                 });
 
-            modelBuilder.Entity("DiplomMagister.Classes.Tests.QuestionAbs", b =>
+            modelBuilder.Entity("DiplomMagister.Classes.Tests.IQuestionAbs", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -94,9 +94,9 @@ namespace DiplomMagister.Migrations
 
                     b.HasIndex("TestId");
 
-                    b.ToTable("QuestionAbs");
+                    b.ToTable("IQuestionAbs");
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("QuestionAbs");
+                    b.HasDiscriminator<string>("Discriminator").HasValue("IQuestionAbs");
                 });
 
             modelBuilder.Entity("DiplomMagister.Classes.Tests.Statistics", b =>
@@ -264,7 +264,7 @@ namespace DiplomMagister.Migrations
 
             modelBuilder.Entity("DiplomMagister.Classes.Tests.BasicQuestion", b =>
                 {
-                    b.HasBaseType("DiplomMagister.Classes.Tests.QuestionAbs");
+                    b.HasBaseType("DiplomMagister.Classes.Tests.IQuestionAbs");
 
                     b.Property<List<string>>("Answers")
                         .IsRequired()
@@ -334,7 +334,7 @@ namespace DiplomMagister.Migrations
                     b.Navigation("UserClient");
                 });
 
-            modelBuilder.Entity("DiplomMagister.Classes.Tests.QuestionAbs", b =>
+            modelBuilder.Entity("DiplomMagister.Classes.Tests.IQuestionAbs", b =>
                 {
                     b.HasOne("DiplomMagister.Classes.Tests.Test", null)
                         .WithMany("Questions")

@@ -12,26 +12,26 @@ namespace DiplomMagister.Migrations
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_QuestionAbs_Tests_TestId",
-                table: "QuestionAbs");
+                table: "IQuestionAbs");
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_QuestionAbs",
-                table: "QuestionAbs");
+                table: "IQuestionAbs");
 
             migrationBuilder.DropIndex(
                 name: "IX_QuestionAbs_TestId",
-                table: "QuestionAbs");
+                table: "IQuestionAbs");
 
             migrationBuilder.DropColumn(
                 name: "Discriminator",
-                table: "QuestionAbs");
+                table: "IQuestionAbs");
 
             migrationBuilder.DropColumn(
                 name: "TestId",
-                table: "QuestionAbs");
+                table: "IQuestionAbs");
 
             migrationBuilder.RenameTable(
-                name: "QuestionAbs",
+                name: "IQuestionAbs",
                 newName: "BasicQuestions");
 
             migrationBuilder.AddColumn<List<string>>(
@@ -78,11 +78,11 @@ namespace DiplomMagister.Migrations
 
             migrationBuilder.RenameTable(
                 name: "BasicQuestions",
-                newName: "QuestionAbs");
+                newName: "IQuestionAbs");
 
             migrationBuilder.AlterColumn<int>(
                 name: "IndexOfTrue",
-                table: "QuestionAbs",
+                table: "IQuestionAbs",
                 type: "integer",
                 nullable: true,
                 oldClrType: typeof(int),
@@ -90,7 +90,7 @@ namespace DiplomMagister.Migrations
 
             migrationBuilder.AlterColumn<string[]>(
                 name: "Answers",
-                table: "QuestionAbs",
+                table: "IQuestionAbs",
                 type: "text[]",
                 nullable: true,
                 oldClrType: typeof(string[]),
@@ -98,30 +98,30 @@ namespace DiplomMagister.Migrations
 
             migrationBuilder.AddColumn<string>(
                 name: "Discriminator",
-                table: "QuestionAbs",
+                table: "IQuestionAbs",
                 type: "text",
                 nullable: false,
                 defaultValue: "");
 
             migrationBuilder.AddColumn<int>(
                 name: "TestId",
-                table: "QuestionAbs",
+                table: "IQuestionAbs",
                 type: "integer",
                 nullable: true);
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_QuestionAbs",
-                table: "QuestionAbs",
+                table: "IQuestionAbs",
                 column: "Id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_QuestionAbs_TestId",
-                table: "QuestionAbs",
+                table: "IQuestionAbs",
                 column: "TestId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_QuestionAbs_Tests_TestId",
-                table: "QuestionAbs",
+                table: "IQuestionAbs",
                 column: "TestId",
                 principalTable: "Tests",
                 principalColumn: "Id");

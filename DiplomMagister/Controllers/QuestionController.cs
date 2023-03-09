@@ -22,22 +22,22 @@ namespace DiplomMagister.Controllers
         }
 
         // GET: QuestionController
-        public ActionResult Index(int testId)
+        public ActionResult Index(int id)
         {
-            var questions = _context.Tests.FirstOrDefault(x => x.Id == testId)?.Questions;
+            var questions = _context.Tests.FirstOrDefault(x => x.Id == id)?.Questions;
             return View(questions);
         }
 
         // GET: QuestionController/Details/5
         public ActionResult Details(int testId, int index)
         {
-            QuestionAbs detailedQuestion;
+            string detailedQuestion;
             try
             {
-                detailedQuestion = QuestionJSONParser.FromJSON(_context.Tests.FirstOrDefault(x => x.Id == testId)?.Questions[index]);
+                detailedQuestion = _context.Tests.FirstOrDefault(x => x.Id == testId)?.Questions[index];
                 if (detailedQuestion == null)
                 {
-                    return RedirectToAction(nameof(Index), new { testId = testId });
+                    return RedirectToAction(nameof(Index), new { id = testId });
                 }
             }
             catch (RegexException ex)
@@ -59,7 +59,7 @@ namespace DiplomMagister.Controllers
         public ActionResult Create(int id)
         {
             var test = _context.Tests.FirstOrDefault(x => x.Id == id);
-            if (test == null) { return RedirectToAction(nameof(Index), new { testId = id }); }
+            if (test == null) { return RedirectToAction(nameof(Index), new { id = id }); }
             ViewBag.TestId = id;
             return View();
         }
@@ -69,7 +69,24 @@ namespace DiplomMagister.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(CreateQuestionViewModel model)
         {
-            QuestionAbs question;
+            IQuestionAbs question;
+            if(model.Answers == null)
+            {
+                if (model.QuestionType == QuestionType.Short)
+                {
+                    model.Answers = new string[]
+                    {
+                        "a1", "a2"
+                    };
+                }
+                else
+                {
+                    model.Answers = new string[]
+                    {
+                        "a1", "a2", "a3", "a4"
+                    };
+                }
+            }
             switch (model.QuestionType)
             {
                 case QuestionType.Basic:
@@ -113,22 +130,31 @@ namespace DiplomMagister.Controllers
             _context.Update(test);
             _context.SaveChanges();
 
-            return RedirectToAction(nameof(Index), new { testId = model.TestId });
+            return RedirectToAction(nameof(Index), new { id = model.TestId });
         }
 
         // GET: QuestionController/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit(int testId, int id)
         {
-            return View();
+            var test = _context.Tests.FirstOrDefault(x => x.Id == testId);
+            if (test == null)
+            {
+                return BadRequest("test wasn't found");
+            }
+            if (test.Questions == null) { test.Questions = new List<string>(); return RedirectToAction(nameof(Index)); }
+            var question = QuestionJSONParser.FromJSONToCreateQuestionViewModel(test.Questions[id], testId);
+
+            return View(question);
         }
 
         // POST: QuestionController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(CreateQuestionViewModel model)
         {
             try
             {
+
                 return RedirectToAction(nameof(Index));
             }
             catch

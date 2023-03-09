@@ -13,9 +13,9 @@ namespace DiplomMagister.Services
             this._context = context;
         }
 
-        public QuestionAbs Create(CreateQuestionViewModel model)
+        public IQuestionAbs Create(CreateQuestionViewModel model)
         {
-            QuestionAbs question;
+            IQuestionAbs question;
             switch (model.QuestionType)
             {
                 case QuestionType.Basic:
@@ -28,7 +28,7 @@ namespace DiplomMagister.Services
             return question;
         }
 
-        private void ParseBasicQuestion(CreateQuestionViewModel model, out QuestionAbs question)
+        private void ParseBasicQuestion(CreateQuestionViewModel model, out IQuestionAbs question)
         {
             question = new BasicQuestion()
             {
