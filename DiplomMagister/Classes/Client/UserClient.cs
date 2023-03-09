@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DiplomMagister.Classes.Tests;
+using JWT_Example_ASP.Models;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -8,25 +10,48 @@ namespace DiplomMagister.Classes.Client
     {
         [Key]
         public string Id { get; set; }
-        public List<Token> Token { get; set; } = new List<Token>();
+        //public ProfileSettings ProfileSettings { get; set; }
+        public ProfileInformation ProfileInformation { get; set; }
 
-        private Role _role = Role.User;
-        public Role Role
-        {
-            get { return _role; }
-            set { _role = value; }
-        }
-
-        public UserInfo Userinfo { get; set; }
+        /// <summary>
+        /// Избранные тэги
+        /// </summary>
+        public List<Tag> Favorites { get; set; } = new List<Tag>();
+        public List<Test> CreatedTests { get; set; } = new List<Test>();
+        public List<Statistics> Statistics { get; set; } = new List<Statistics>();
     }
 
     [Owned]
-    public class UserInfo
+    public class ProfileInformation
     {
         public string Name { get; set; } = "";
         public string FirstName { get; set; } = "";
-        public string? Middlename { get; set; }
         public string Lastname { get; set; } = "";
+        public string Mail { get; set; } = "";
+
+        public DateTime? EditingDate { get; set; }
+
+
+        public Privacy Privacy { get; set; } = Privacy.Public;
+    }
+
+    public enum Privacy
+    {
+        [Description("Скрытый")]
+        [Display(Name = "Скрытый")]
+        Hidden = 0,
+
+        [Description("Закрытый")]
+        [Display(Name = "Закрытый")]
+        Private = 1,
+
+        [Description("Открытый")]
+        [Display(Name = "Открытый")]
+        Public = 2,
+
+        [Description("Пользовательский")]
+        [Display(Name = "Пользовательский")]
+        Custom = 4,
     }
 
     public enum Role

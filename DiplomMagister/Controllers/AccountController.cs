@@ -1,7 +1,9 @@
 ﻿using DiplomMagister.Data;
 using DiplomMagister.Models;
 using DiplomMagister.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace DiplomMagister.Controllers
 {
@@ -19,6 +21,10 @@ namespace DiplomMagister.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            if (HttpContext.User.Identity.IsAuthenticated)
+            {
+                return RedirectToActionPermanent("Index", "Home");
+            }
             return View();
         }
 
@@ -26,15 +32,35 @@ namespace DiplomMagister.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Login(LoginViewModel loginViewModel)
         {
-            var identity = _accountService.GetIdentity(loginViewModel.Login, loginViewModel.Password);
-            if (identity == null)
+            try
             {
-                return BadRequest(new { errorText = "Invalid username or password." });
-            }
+                var identity = _accountService.GetIdentity(loginViewModel.Login, loginViewModel.Password);
+                if (identity == null)
+                {
+                    throw new Exception("User not found");
+                }
 
-            _accountService.Login(identity, HttpContext);
-            
+                _accountService.Login(identity, HttpContext);
+            }
+            catch
+            {
+                ModelState.AddModelError("LoginError", "Аккаунт не найден. Проверьте логин и пароль");
+                return View(loginViewModel);
+            }
             return RedirectToActionPermanent("Index", "Home");
+        }
+
+        public IActionResult Logout()
+        {
+            try
+            {
+                _accountService.Logout(HttpContext);
+            }
+            catch (Exception ex)
+            {
+                Log($"{ex.ToString()}");
+            }
+            return RedirectToAction("Login", "Account");
         }
 
         [HttpGet]
@@ -62,6 +88,11 @@ namespace DiplomMagister.Controllers
                 return View();
             }
             return RedirectToAction("Login", "Account");
+        }
+
+        private void Log(string v)
+        {
+            Debug.WriteLine($"\n\n\n{v}\n\n\n");
         }
     }
 }

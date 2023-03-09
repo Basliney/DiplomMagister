@@ -1,0 +1,30 @@
+﻿@using DiplomMagister.Classes.StaticData
+@using DiplomMagister.Classes.Tests
+@model CreateQuestionViewModel
+@{
+    
+}
+
+<div class="card card-body">
+    <form asp-antiforgery="true" asp-action="Create" asp-controller="Question" method="post">
+        <input asp-for="TestId" class="d-none" value="@ViewBag.TestId"/>
+
+        <label asp-for="Tittle">Введите название вопроса</label>
+        <input type="text" asp-for="Tittle" placeholder="Название вопроса" />
+        <span asp-validation-for="Tittle" class="text-danger"></span>
+
+        <label asp-for="Essence">Введите суть вопроса</label>
+        <input type="text" asp-for="Essence" placeholder="Суть вопроса"/>
+        <span asp-validation-for="Essence" class="text-danger"></span>
+
+        <label asp-for="TotalScore">Введите влияние на результат</label>
+        <input type="number" asp-for="TotalScore" placeholder="" />
+        <span asp-validation-for="TotalScore" class="text-danger"></span>
+
+        <label asp-for="QuestionType">Выберите тип вопроса</label>
+        <input type="radio" asp-for="QuestionType" value="@QuestionType.Basic.GetEnumDescription()"/>
+        <span asp-validation-for="QuestionType" class="text-danger"></span>
+
+        <input type="submit" value="Создать" />
+    </form>
+</div>

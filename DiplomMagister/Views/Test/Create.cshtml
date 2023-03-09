@@ -1,0 +1,21 @@
+﻿@using DiplomMagister.Models;
+@model CreateTestViewModel;
+
+@{
+}
+
+<div class="card card-body">
+    <form asp-antiforgery="true" asp-action="Create" asp-controller="Test" method="post">
+
+        <label asp-for="Tittle"></label>
+        <input type="text" asp-for="Tittle" placeholder="Tittle" />
+        <span asp-validation-for="Tittle" class="text-danger"></span>
+
+        <label asp-for="Description">Введите пароль</label>
+        <input type="text" asp-for="Description" placeholder="Description"/>
+        <span asp-validation-for="Description" class="text-danger"></span>
+
+        <input type="submit" value="Create" />
+    </form>
+</div>
+
