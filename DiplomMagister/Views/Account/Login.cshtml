@@ -1,22 +1,36 @@
 ﻿@using DiplomMagister.Models;
-@model LoginViewModel 
+@model LoginViewModel
 
 @{
 
 }
 
-<div class="card card-body">
-    <form asp-antiforgery="true" asp-action="Login" asp-controller="Account" method="post">
-        <span id="LoginError" class="text-danger"></span>
+<div class="d-flex flex-column justify-content-between align-items-center text-center" style="min-height: 65vh">
+    <div class="d-flex flex-column w-100">
+        <br/>
+        <div class="col-12 text-primary default-text"><h1>Тесты<sup>3</sup></h1></div>
+        <div class="col-12"><hr /></div>
+    </div>
+    <div class="w-25 text-center">
+        <div>
+            <h1>Авторизация</h1>
+        </div>
+        <form class="d-flex flex-column justify-content-end h-100" asp-antiforgery="true" asp-action="Login" asp-controller="Account" method="post">
 
-        <label asp-for="Login"></label>
-        <input type="email" asp-for="Login" placeholder="example@mail.ru" />
-        <span asp-validation-for="Login" class="text-danger"></span>
+            <label asp-for="Login" class="d-flex col-12 justify-content-start"></label>
+            <input type="email" asp-for="Login" placeholder="example@mail.ru" class="col-12 form-control" />
+            <span asp-validation-for="Login" class="text-danger" class="col-12"></span>
 
-        <label asp-for="Password">Введите пароль</label>
-        <input type="password" asp-for="Password" placeholder="******" />
-        <span asp-validation-for="Password" class="text-danger"></span>
+            <label asp-for="Password" class="d-flex col-12 justify-content-start mt-4">Введите пароль</label>
+            <input type="password" asp-for="Password" placeholder="********" class="col-12 form-control" />
+            <span asp-validation-for="Password" class="text-danger" class="col-12"></span>
+            <a href="#" class="d-flex text-primary justify-content-end" style="text-decoration: none;">Забыли пароль?</a><br />
+            <input class="btn btn-primary mt-2 w-100" type="submit" value="Войти" /><br />
 
-        <input type="submit" value="Войти"/>
-    </form>
+            <div class="mt-5 col-12 ">
+                <p class="mb-0">Первый раз тут?</p>
+                <a href="/Account/Register" class="text-black">Зарегистрироваться</a>
+            </div>
+        </form>
+    </div>
 </div>

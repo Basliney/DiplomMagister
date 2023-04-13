@@ -4,6 +4,7 @@ using DiplomMagister.Classes.DTOs;
 using DiplomMagister.Classes.Tests;
 using JWT_Example_ASP.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace DiplomMagister.Data
 {
@@ -26,18 +27,11 @@ namespace DiplomMagister.Data
         public ApplicationDbContext()
         {
             Database.EnsureCreated();
-            //Database.Migrate();
         }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseNpgsql("Host=localhost;Port=5433;Database=MagisterDb;Username=postgres;Password=3365241Tt");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            //modelBuilder.Entity<Owner>()
-            //    .HasOne(x => x.)
-            //    .WithOne(x => x.Owner);
         }
     }
 

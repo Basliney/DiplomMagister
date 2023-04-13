@@ -28,9 +28,10 @@ namespace DiplomMagister.Classes.Client
         public string FirstName { get; set; } = "";
         public string Lastname { get; set; } = "";
         public string Mail { get; set; } = "";
+        public string Image { get; set; } = "";
 
         public DateTime? EditingDate { get; set; }
-
+        public DateTime? LastEnterance { get; set; }
 
         public Privacy Privacy { get; set; } = Privacy.Public;
     }

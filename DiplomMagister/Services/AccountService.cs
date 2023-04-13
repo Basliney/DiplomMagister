@@ -106,12 +106,12 @@ namespace DiplomMagister.Services
 
             try
             {
-                httpContext.Response.Cookies.Append("accessToken", $"{encodedJwt}");
+                httpContext.Response.Cookies.Append("accessToken", $"{encodedJwt}", new() { SameSite = SameSiteMode.Lax });
             }
             catch(Exception ex)
             {
                 httpContext.Response.Cookies.Delete("accessToken");
-                httpContext.Response.Cookies.Append("accessToken", $"{encodedJwt}");
+                httpContext.Response.Cookies.Append("accessToken", $"{encodedJwt}", new() { SameSite = SameSiteMode.Lax });
             }
         }
 

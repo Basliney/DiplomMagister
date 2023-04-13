@@ -1,19 +1,55 @@
 using DiplomMagister.Classes;
 using DiplomMagister.Data;
 using DiplomMagister.Middlewares;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using NLog.Targets;
+using NLog;
+using NLog.Web;
+using System.Text;
+using Microsoft.Extensions.Logging;
+using DiplomMagister.Services.OutServices;
 
 internal class Program
 {
+    public static NLog.Logger Logger = LogManager.GetCurrentClassLogger();
+
     private static void Main(string[] args)
     {
+
+
+        var folderName = $"{Environment.CurrentDirectory}{Path.DirectorySeparatorChar}Logs";
+
+        if (!Directory.Exists(folderName))
+        {
+            Directory.CreateDirectory(folderName);
+        }
+
+        var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+        var fileTarget = new FileTarget($"target")
+        {
+            FileName = $"{folderName}{Path.DirectorySeparatorChar}${{shortdate}}.log",
+            Layout = "${longdate}|${event-properties:item=EventId:whenEmpty=0}|${level:uppercase=true}|${_logger}|${message}|${exception:format=tostring}",
+            KeepFileOpen = false,
+            MaxArchiveDays = 14,
+            ArchiveAboveSize = 4096000,
+            Encoding = Encoding.UTF8,
+        };
+        LogManager.Setup().LoadConfiguration(builder =>
+        {
+            builder.ForLogger().Targets.Add(fileTarget);
+        });
+
         var builder = WebApplication.CreateBuilder(args);
         var configuration = builder.Configuration;
         var connection = configuration.GetConnectionString("DefaultConnection");
 
         builder.Services.AddRazorPages();
+
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
@@ -44,38 +80,54 @@ internal class Program
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connection));
 
-        var app = builder.Build();
+        builder.Logging.ClearProviders();
+        builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection(EmailOptions.Position));
+        builder.Services.AddSingleton<IEmailService, EmailService>();
+        builder.Host.UseNLog();
 
-        // Configure the HTTP request pipeline.
-        if (!app.Environment.IsDevelopment())
+        try
         {
-            app.UseExceptionHandler("/Home/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts();
+            Logger = logger;
+            var app = builder.Build();
+
+            // Configure the HTTP request pipeline.
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseExceptionHandler("/Home/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
+
+            app.UseDeveloperExceptionPage();
+
+            app.UseHttpsRedirection();
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
+            app.UseRouting();
+
+            app.UseMiddleware<TokenMiddleware>();
+            app.UseMiddleware<AccessMiddleware>();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapDefaultControllerRoute();
+            });
+
+            Logger.Info("Запуск приложения");
+            app.Run();
         }
-
-        app.UseDeveloperExceptionPage();
-
-        app.UseHttpsRedirection();
-
-        app.UseDefaultFiles();
-        app.UseStaticFiles();
-
-        app.UseRouting();
-
-        app.UseMiddleware<TokenMiddleware>();
-        app.UseMiddleware<AccessMiddleware>();
-
-        app.UseAuthentication();
-        app.UseAuthorization();
-
-        //app.UseMiddleware<AccessMiddleware>();
-
-        app.UseEndpoints(endpoints =>
+        catch (Exception ex)
         {
-            endpoints.MapDefaultControllerRoute();
-        });
-
-        app.Run();
+            logger.Error(ex, "Program has been stopped");
+        }
+        finally
+        {
+            LogManager.Shutdown();
+        }
     }
 }

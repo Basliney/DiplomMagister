@@ -1,18 +1,47 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
+}
+
+.unload-text {
+    font-family: Unload;
+}
+
+.default-text {
+    font-family: 'Times New Roman';
+}
+
+.header-text {
+    font-family: 'Header';
+    font-weight: bold;
+}
+
+.login-form {
 }
 
 body {
-  margin-bottom: 60px;
+}
+
+#profile-image {
+    width: 64px;
+}
+
+@font-face {
+    font-family: "Unload";
+    src: url("/fonts/Unload.ttf");
+}
+
+@font-face {
+    font-family: "Header";
+    src: url("/fonts/Header.ttf");
 }
